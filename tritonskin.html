@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TritonSkin — How Deep-Water Data Centers Breathe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#040f16;
+    --bg-mid:#071e2b;
+    --bg-panel:#0b2735;
+    --bg-panel-2:#0e3040;
+    --accent-bio:#46f2c0;
+    --accent-warm:#ff7a54;
+    --accent-cold:#4fb8ff;
+    --text-hi:#eaf6f3;
+    --text-lo:#8fb4bc;
+    --line: rgba(234,246,243,0.09);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg-deep);
+    color:var(--text-hi);
+    font-family:'Inter',sans-serif;
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--accent-bio); color:var(--bg-deep);}
+
+  h1,h2,h3{font-family:'Fraunces',serif; font-weight:500; letter-spacing:-0.01em;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.72rem;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--accent-bio);
+    display:flex; align-items:center; gap:0.6em;
+  }
+  .eyebrow::before{content:''; width:22px; height:1px; background:var(--accent-bio); display:inline-block;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:inherit;}
+
+  section{position:relative; padding:5rem 6vw;}
+  @media (max-width:720px){ section{padding:3.2rem 6vw;} }
+  .wrap{max-width:1100px; margin:0 auto;}
+
+  /* ---------- HERO ---------- */
+  #hero{padding:0; height:min(92vh,780px); min-height:560px; position:relative; overflow:hidden;}
+  #heroCanvas{position:absolute; inset:0; width:100%; height:100%; display:block;}
+  .hero-fade{position:absolute; left:0; right:0; bottom:0; height:26%; background:linear-gradient(to bottom, rgba(4,15,22,0), var(--bg-deep)); pointer-events:none;}
+  .hero-content{
+    position:relative; z-index:2; height:100%;
+    display:flex; flex-direction:column; justify-content:flex-end;
+    padding:0 6vw 4.2rem;
+  }
+  .hero-content h1{
+    font-size:clamp(2.6rem, 6.4vw, 5.2rem);
+    font-weight:500;
+    line-height:0.98;
+    max-width:14ch;
+    color:#fff;
+    text-shadow:0 2px 40px rgba(70,242,192,0.15);
+  }
+  .hero-content h1 em{font-style:italic; color:var(--accent-bio); font-weight:400;}
+  .hero-sub{
+    margin-top:1.1rem; max-width:44ch; color:var(--text-lo); font-size:1.05rem;
+  }
+  .hero-meta{
+    display:flex; gap:2.4rem; margin-top:2.2rem; flex-wrap:wrap;
+  }
+  .hero-meta div{font-family:'IBM Plex Mono',monospace; font-size:0.78rem; color:var(--accent-cold);}
+  .hero-meta span{display:block; color:var(--text-lo); font-size:0.7rem; margin-top:0.2rem;}
+  .scroll-cue{
+    position:absolute; z-index:2; right:6vw; bottom:2.2rem;
+    font-family:'IBM Plex Mono',monospace; font-size:0.68rem; color:var(--text-lo);
+    letter-spacing:0.1em; writing-mode:vertical-rl; display:flex; align-items:center; gap:0.6rem;
+  }
+  .scroll-cue::after{content:''; width:1px; height:38px; background:linear-gradient(var(--accent-bio), transparent); animation:cueMove 2.2s ease-in-out infinite;}
+  @keyframes cueMove{0%,100%{opacity:0.3;} 50%{opacity:1;}}
+
+  /* ---------- SECTION HEADERS ---------- */
+  .sec-head{max-width:640px; margin-bottom:3rem;}
+  .sec-head h2{font-size:clamp(1.7rem,3.2vw,2.5rem); margin-top:0.8rem; color:#fff;}
+  .sec-head p{color:var(--text-lo); margin-top:0.9rem; font-size:1rem; max-width:56ch;}
+
+  /* ---------- HOW IT WORKS: STEPS ---------- */
+  .steps{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:14px; overflow:hidden;}
+  @media (max-width:880px){ .steps{grid-template-columns:1fr 1fr;} }
+  @media (max-width:520px){ .steps{grid-template-columns:1fr;} }
+  .step{background:var(--bg-mid); padding:1.8rem 1.5rem 2rem; position:relative;}
+  .step .num{font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color:var(--accent-warm);}
+  .step h3{font-size:1.08rem; margin-top:0.9rem; color:#fff; font-weight:500;}
+  .step p{font-size:0.86rem; color:var(--text-lo); margin-top:0.5rem;}
+  .step-icon{width:100%; height:64px; margin-top:1.2rem;}
+
+  /* ---------- BIOFOULING PANEL ---------- */
+  .panel{
+    background:linear-gradient(160deg, var(--bg-panel), var(--bg-mid));
+    border:1px solid var(--line); border-radius:18px;
+    padding:2.4rem clamp(1.2rem,4vw,3rem);
+  }
+  .fouling-grid{display:grid; grid-template-columns:1.1fr 1fr; gap:2.6rem; align-items:center;}
+  @media (max-width:820px){ .fouling-grid{grid-template-columns:1fr;} }
+  .eq{
+    font-family:'IBM Plex Mono',monospace; font-size:0.92rem; color:var(--accent-bio);
+    background:rgba(70,242,192,0.06); border:1px solid rgba(70,242,192,0.18);
+    padding:0.9rem 1.1rem; border-radius:8px; margin:1rem 0; display:inline-block;
+  }
+  .fouling-copy p{color:var(--text-lo); font-size:0.94rem; margin-bottom:0.9rem;}
+  .actuator-btn{
+    font-family:'IBM Plex Mono',monospace; font-size:0.78rem; letter-spacing:0.04em;
+    background:var(--accent-bio); color:#04211a; border:none; padding:0.85rem 1.3rem;
+    border-radius:8px; cursor:pointer; font-weight:600; transition:transform .15s ease, box-shadow .15s ease;
+    box-shadow:0 0 0 rgba(70,242,192,0);
+  }
+  .actuator-btn:hover{transform:translateY(-1px);}
+  .actuator-btn.active{background:var(--accent-warm); color:#2a0f06; box-shadow:0 0 26px rgba(255,122,84,0.45);}
+  .status-line{margin-top:0.9rem; font-family:'IBM Plex Mono',monospace; font-size:0.74rem; color:var(--text-lo);}
+  .status-line b{color:var(--accent-cold);}
+  .status-line.on b{color:var(--accent-warm);}
+  canvas#foulingChart{width:100%; height:220px; display:block; margin-top:1.2rem;}
+
+  /* ---------- THERMAL PLUME ---------- */
+  .plume-grid{display:grid; grid-template-columns:1fr 1fr; gap:2.6rem; align-items:center;}
+  @media (max-width:820px){ .plume-grid{grid-template-columns:1fr;} }
+  canvas#plumeCanvas{width:100%; height:320px; display:block; border-radius:14px; background:radial-gradient(circle at 30% 50%, #071e2b, #040f16);}
+  .legend{display:flex; gap:1.4rem; margin-top:1rem; flex-wrap:wrap;}
+  .legend div{display:flex; align-items:center; gap:0.5rem; font-size:0.76rem; color:var(--text-lo); font-family:'IBM Plex Mono',monospace;}
+  .swatch{width:10px; height:10px; border-radius:50%;}
+
+  /* ---------- CLOSED LOOP ---------- */
+  .loop-wrap{display:flex; justify-content:center;}
+  #loopSvg{width:100%; max-width:560px; height:auto;}
+  .loop-caption{text-align:center; color:var(--text-lo); font-size:0.85rem; margin-top:1.2rem; font-family:'IBM Plex Mono',monospace;}
+
+  /* ---------- WEAKNESS / CTA ---------- */
+  .honest{border-left:2px solid var(--accent-warm); padding-left:1.2rem; margin-top:1.6rem;}
+  .honest li{color:var(--text-lo); font-size:0.92rem; margin-bottom:0.6rem; list-style:none;}
+  .honest li::before{content:'— '; color:var(--accent-warm);}
+
+  footer{padding:3rem 6vw; border-top:1px solid var(--line); color:var(--text-lo); font-size:0.8rem; font-family:'IBM Plex Mono',monospace; display:flex; justify-content:space-between; flex-wrap:wrap; gap:1rem;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+
+  /* Floating navigation back-link */
+  .back-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: rgba(11, 39, 53, 0.85);
+    border: 1px solid rgba(70, 242, 192, 0.45);
+    color: var(--accent-bio);
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    transition: all 0.3s ease;
+  }
+  .back-btn:hover {
+    background: var(--accent-bio);
+    color: #04211a;
+    box-shadow: 0 0 15px rgba(70, 242, 192, 0.35);
+    transform: translateY(-1px);
+  }
+</style>
+</head>
+<body>
+
+<!-- Navigation Back Link -->
+<a href="index.html" class="back-btn">
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M19 12H5M12 19l-7-7 7-7"/>
+  </svg>
+  AQUASHIELD 3D
+</a>
+
+<section id="hero">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-fade"></div>
+  <div class="hero-content">
+    <span class="eyebrow">TRITONSKIN — DIGITAL TWIN PROTOTYPE</span>
+    <h1>The hull breathes<br><em>cold</em> in, <em>warm</em> out.</h1>
+    <p class="hero-sub">Every underwater data center survives on one quiet exchange: seawater drawn in cold, pushed out warm. TritonSkin watches that exchange for the three things nobody else is monitoring — fouling, ecological drift, and structural fatigue.</p>
+    <div class="hero-meta">
+      <div>~4°C<span>intake temp, depth-dependent</span></div>
+      <div>R_f(t) = R_f&middot;(1−e^(−t/τ))<span>fouling growth, modeled live below</span></div>
+      <div>ΔT(r) = ΔT₀&middot;e^(−r/L)<span>thermal plume decay</span></div>
+    </div>
+  </div>
+  <div class="scroll-cue">SCROLL</div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">01 — THE MECHANISM</span>
+      <h2>How a sealed pod cools itself a kilometre down</h2>
+      <p>No fans, no open loop with the ocean, no moving parts touching seawater directly. Heat leaves the hull the same way it always has underwater — through a temperature difference and a hull wall. Four things happen, in this order, continuously.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="num">01 / INTAKE</div>
+        <h3>Cold water arrives</h3>
+        <p>Ambient seawater near the hull sits colder than the servers inside. That gap is the entire cooling budget — no pumps make it colder, they only move it faster.</p>
+        <svg class="step-icon" viewBox="0 0 200 64"><path id="s1path" d="M0,32 Q30,10 60,32 T120,32 T200,32" stroke="var(--accent-cold)" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      </div>
+      <div class="step">
+        <div class="num">02 / EXCHANGE</div>
+        <h3>Heat crosses the hull wall</h3>
+        <p>Server heat conducts through a sealed metal skin into the boundary layer of water hugging it. Fouling on that skin is the enemy here — it insulates exactly where you need conduction.</p>
+        <svg class="step-icon" viewBox="0 0 200 64"><rect x="86" y="8" width="28" height="48" rx="4" fill="none" stroke="var(--accent-warm)" stroke-width="2"/><path d="M20,32 L84,32" stroke="var(--accent-cold)" stroke-width="2" stroke-linecap="round"/><path d="M116,32 L180,32" stroke="var(--accent-warm)" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <div class="step">
+        <div class="num">03 / OUTFLOW</div>
+        <h3>Warm water leaves</h3>
+        <p>Now carrying that heat, the water exits the hull's far side measurably warmer — the plume regulators are built to catch and disperse this before it stresses local marine life.</p>
+        <svg class="step-icon" viewBox="0 0 200 64"><path d="M0,32 Q30,54 60,32 T120,32 T200,32" stroke="var(--accent-warm)" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      </div>
+      <div class="step">
+        <div class="num">04 / DISSIPATION</div>
+        <h3>The ocean absorbs it</h3>
+        <p>Deep-ocean thermal mass is enormous — the plume cools exponentially with distance. The open question isn't "does it dissipate," it's "how close is safe for the reef 40m away."</p>
+        <svg class="step-icon" viewBox="0 0 200 64"><circle cx="30" cy="32" r="6" fill="var(--accent-warm)"/><circle cx="30" cy="32" r="16" fill="none" stroke="var(--accent-warm)" stroke-width="1.4" opacity="0.6"/><circle cx="30" cy="32" r="26" fill="none" stroke="var(--accent-warm)" stroke-width="1.2" opacity="0.3"/></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="fouling">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">02 — THE HIDDEN LOSS</span>
+      <h2>Biofouling is winning quietly, until you turn on the actuator</h2>
+      <p>Barnacles, algae, and biofilm don't care that step 02 above needs a clean hull. Left alone, fouling resistance climbs toward its asymptote and the pump has to work harder just to hold temperature. This chart is a live physics simulation, not a mockup — press the button and watch the growth curve actually bend.</p>
+    </div>
+    <div class="panel">
+      <div class="fouling-grid">
+        <div>
+          <canvas id="foulingChart"></canvas>
+          <div class="status-line" id="statusLine">Ultrasonic actuator: <b>OFF</b> — fouling resistance accumulating toward R_f*.</div>
+        </div>
+        <div class="fouling-copy">
+          <p>Fouling resistance follows a Kern–Seaton asymptotic model, the same curve heat-exchanger engineers have used for decades:</p>
+          <div class="eq">R_f(t) = R_f&middot; (1 − e^(−t/τ))</div>
+          <p>As R_f rises, effective heat transfer U(t) = 1 / (1/U_clean + R_f(t)) falls — meaning the pump quietly draws more power to hold the same server temperature. That's the cost nobody puts on a spec sheet.</p>
+          <p>Ultrasonic actuation doesn't sterilize the hull to zero. Published antifouling studies show a 40–70% reduction in settlement while active — this simulation runs on that same honest range, not a marketing number.</p>
+          <button class="actuator-btn" id="actuatorBtn">⚡ Activate ultrasonic actuator</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="plume">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">03 — THE ECOLOGICAL FOOTPRINT</span>
+      <h2>Watching the plume so a regulator doesn't have to ask</h2>
+      <p>Warm outflow spreads and cools by advection-diffusion — fast near the hull, negligible a short distance out. TritonSkin's job is proving exactly where that line sits, continuously, instead of a one-time environmental impact study.</p>
+    </div>
+    <div class="panel">
+      <div class="plume-grid">
+        <canvas id="plumeCanvas"></canvas>
+        <div>
+          <div class="eq">ΔT(r) = ΔT₀ · e^(−r/L)</div>
+          <p style="color:var(--text-lo); font-size:0.94rem; margin-top:0.6rem;">Temperature above ambient decays exponentially with distance r from the outlet, governed by a decay length L set by current speed and outlet geometry. The rings on the left are that equation, rendered — not decorative circles.</p>
+          <div class="legend">
+            <div><span class="swatch" style="background:var(--accent-warm);"></span> Outflow, +ΔT₀ at source</div>
+            <div><span class="swatch" style="background:var(--accent-cold);"></span> Ambient, ΔT ≈ 0</div>
+          </div>
+          <p style="color:var(--text-lo); font-size:0.86rem; margin-top:1rem;">Paired with a bioacoustic anomaly classifier trained on public whale/dolphin/fish acoustic datasets layered onto synthetic ambient noise — real acoustic signatures, honestly disclosed as not yet pod-recorded.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="loop">
+  <div class="wrap">
+    <div class="sec-head" style="max-width:100%; text-align:center; margin-left:auto; margin-right:auto;">
+      <span class="eyebrow" style="justify-content:center;">04 — THE CLOSED LOOP</span>
+      <h2>The one moment that separates this from a dashboard</h2>
+      <p style="margin-left:auto; margin-right:auto;">A dashboard shows numbers. This system acts on them, then watches its own action change the next reading. That loop, running visibly, is the entire pitch.</p>
+    </div>
+    <div class="loop-wrap">
+      <svg id="loopSvg" viewBox="0 0 480 480">
+        <defs>
+          <path id="loopPath" d="M 240 70 A 170 170 0 1 1 239.9 70" fill="none"/>
+        </defs>
+        <circle cx="240" cy="240" r="170" fill="none" stroke="var(--line)" stroke-width="1.5"/>
+        <g id="loopNodes"></g>
+        <circle r="7" fill="var(--accent-bio)">
+          <animateMotion dur="6s" repeatCount="indefinite">
+            <mpath href="#loopPath"/>
+          </animateMotion>
+        </circle>
+      </svg>
+    </div>
+    <p class="loop-caption">SENSOR → AI MODEL → ACTUATOR COMMAND → PHYSICAL EFFECT → back to SENSOR</p>
+  </div>
+</section>
+
+<section id="honest">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">05 — SAID BEFORE ANYONE ASKS</span>
+      <h2>What this simulation is, and isn't, yet</h2>
+    </div>
+    <ul class="honest">
+      <li>Every curve above is physics-grounded synthetic data — real published models, not real seawater. The next phase is a physical tank testbed.</li>
+      <li>The acoustic classifier trains on real public bioacoustic recordings, not real pod-site audio.</li>
+      <li>TEG energy self-sufficiency uses datasheet ΔT–power curves; real operating ΔT still needs to be measured on hardware.</li>
+      <li>Pressure-rated production housings are a separate certification effort this phase doesn't attempt.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div>TRITONSKIN — SOFTWARE-ONLY PROTOTYPE</div>
+  <div>DIGITAL TWIN · CLOSED-LOOP AI · HONEST BY DESIGN</div>
+</footer>
+
+<script>
+/* ============ HERO: layered waves + pod flow field ============ */
+(function(){
+  const canvas = document.getElementById('heroCanvas');
+  const ctx = canvas.getContext('2d');
+  let W,H,DPR;
+  function resize(){
+    DPR = Math.min(window.devicePixelRatio||1, 2);
+    W = canvas.clientWidth; H = canvas.clientHeight;
+    canvas.width = W*DPR; canvas.height = H*DPR;
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ambient bioluminescent particles
+  const ambient = Array.from({length:60}, ()=>({
+    x:Math.random(), y:Math.random(), r:Math.random()*1.6+0.4,
+    s:Math.random()*0.15+0.03, phase:Math.random()*Math.PI*2
+  }));
+
+  // pod geometry (fractions of canvas)
+  function podPath(){
+    const cx = 0.5, cy = 0.72, w = 0.30, h = 0.09;
+    return {cx,cy,w,h};
+  }
+
+  // flow particles: t in [0,1] traveling along a bezier around the pod
+  const flow = Array.from({length:70}, (_,i)=>({
+    t: i/70, speed: 0.0016+Math.random()*0.0012, off: (Math.random()-0.5)*0.02
+  }));
+
+  function bezier(p0,p1,p2,p3,t){
+    const mt=1-t;
+    return {
+      x: mt*mt*mt*p0.x + 3*mt*mt*t*p1.x + 3*mt*t*t*p2.x + t*t*t*p3.x,
+      y: mt*mt*mt*p0.y + 3*mt*mt*t*p1.y + 3*mt*t*t*p2.y + t*t*t*p3.y
+    };
+  }
+
+  let time = 0;
+  function draw(){
+    time += 1;
+    // background depth gradient
+    const g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#0a2a3a');
+    g.addColorStop(0.35,'#071e2b');
+    g.addColorStop(1,'#040f16');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,W,H);
+
+    // surface waves (top band, suggests the ocean surface far above)
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    for(let layer=0; layer<3; layer++){
+      ctx.beginPath();
+      const amp = 10 - layer*2.4;
+      const yBase = H*0.10 + layer*10;
+      const speed = 0.006 + layer*0.003;
+      ctx.moveTo(0, yBase);
+      for(let x=0;x<=W;x+=8){
+        const y = yBase + Math.sin(x*0.014 + time*speed + layer)* amp;
+        ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle = layer===0 ? 'rgba(79,184,255,0.35)' : 'rgba(70,242,192,0.18)';
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // ambient particles (bioluminescence)
+    ambient.forEach(p=>{
+      p.y -= p.s*0.001;
+      if(p.y < 0) p.y = 1;
+      const flicker = 0.4 + 0.6*Math.abs(Math.sin(time*0.02 + p.phase));
+      ctx.beginPath();
+      ctx.arc(p.x*W, p.y*H, p.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(70,242,192,${0.25*flicker})`;
+      ctx.fill();
+    });
+
+    // pod
+    const {cx,cy,w,h} = podPath();
+    const px = cx*W, py = cy*H, pw = w*W, ph = h*H;
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(px, py, pw/2, ph/2, 0, 0, Math.PI*2);
+    ctx.fillStyle = '#0e2f3d';
+    ctx.strokeStyle = 'rgba(234,246,243,0.25)';
+    ctx.lineWidth = 1.5;
+    ctx.fill(); ctx.stroke();
+    // heat-exchange band on pod
+    ctx.beginPath();
+    ctx.ellipse(px, py, pw*0.32, ph*0.7, 0, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(255,122,84,0.35)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.restore();
+
+    // flow path control points: enters left-cold, curves over pod, exits right-warm
+    const p0 = {x: px - pw*1.6, y: py - ph*0.1};
+    const p1 = {x: px - pw*0.5, y: py - ph*1.6};
+    const p2 = {x: px + pw*0.5, y: py - ph*1.6};
+    const p3 = {x: px + pw*1.7, y: py - ph*0.05};
+
+    flow.forEach(f=>{
+      f.t += f.speed;
+      if(f.t > 1) f.t = 0;
+      const pos = bezier(p0,p1,p2,p3, f.t);
+      const y = pos.y + f.off*H*Math.sin(f.t*Math.PI);
+      // color: cold -> warm as t progresses (absorbing heat over the pod)
+      const warmth = Math.min(1, Math.max(0, (f.t-0.25)/0.55));
+      const r = Math.round(79 + warmth*(255-79));
+      const gC = Math.round(184 + warmth*(122-184));
+      const b = Math.round(255 + warmth*(84-255));
+      ctx.beginPath();
+      ctx.arc(pos.x, y, 1.8, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(${r},${gC},${b},0.8)`;
+      ctx.fill();
+    });
+
+    // dissipating outflow rings
+    for(let i=0;i<3;i++){
+      const phase = ((time*0.6 + i*70) % 210);
+      const rad = phase*1.1;
+      const alpha = Math.max(0, 0.32 - phase/210*0.32);
+      ctx.beginPath();
+      ctx.arc(p3.x+18, p3.y+6, rad, 0, Math.PI*2);
+      ctx.strokeStyle = `rgba(255,122,84,${alpha})`;
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+    }
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ============ FOULING CHART: live physics sim + actuator toggle ============ */
+(function(){
+  const canvas = document.getElementById('foulingChart');
+  const ctx = canvas.getContext('2d');
+  const btn = document.getElementById('actuatorBtn');
+  const statusLine = document.getElementById('statusLine');
+  let DPR, W, H;
+  function resize(){
+    DPR = Math.min(window.devicePixelRatio||1,2);
+    W = canvas.clientWidth; H = canvas.clientHeight || 220;
+    canvas.style.height = '220px';
+    canvas.width = W*DPR; canvas.height = 220*DPR;
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    H = 220;
+  }
+  window.addEventListener('resize', resize);
+
+  let R = 0.02;        // current fouling resistance, normalized 0..1
+  const Rmax = 0.94;
+  let actuatorOn = false;
+  const history = [];
+  const maxPoints = 260;
+
+  btn.addEventListener('click', ()=>{
+    actuatorOn = !actuatorOn;
+    btn.classList.toggle('active', actuatorOn);
+    btn.textContent = actuatorOn ? '⏸ Deactivate actuator' : '⚡ Activate ultrasonic actuator';
+    statusLine.classList.toggle('on', actuatorOn);
+    statusLine.innerHTML = actuatorOn
+      ? 'Ultrasonic actuator: <b>ON</b> — settlement rate suppressed, resistance decaying.'
+      : 'Ultrasonic actuator: <b>OFF</b> — fouling resistance accumulating toward R_f*.';
+  });
+
+  function step(){
+    if(actuatorOn){
+      R -= R*0.012;              // active clearing, asymptotic decay toward 0
+      R = Math.max(R, 0.015);
+    } else {
+      R += (Rmax - R)*0.010;     // Kern-Seaton asymptotic growth toward R_f*
+    }
+    history.push(R);
+    if(history.length > maxPoints) history.shift();
+  }
+
+  function draw(){
+    step();
+    resize();
+    ctx.clearRect(0,0,W,H);
+    const padL=34, padR=10, padT=14, padB=24;
+    const plotW = W-padL-padR, plotH = H-padT-padB;
+
+    // axes
+    ctx.strokeStyle = 'rgba(234,246,243,0.12)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padL, padT); ctx.lineTo(padL, H-padB); ctx.lineTo(W-padR, H-padB);
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(143,180,188,0.8)';
+    ctx.font = '10px "IBM Plex Mono", monospace';
+    ctx.fillText('R_f*', 4, padT+4);
+    ctx.fillText('0', 4, H-padB+3);
+    ctx.fillText('t →', W-padR-16, H-8);
+
+    // R_f* asymptote line
+    const yFor = v => (H-padB) - v*plotH;
+    ctx.strokeStyle = 'rgba(255,122,84,0.25)';
+    ctx.setLineDash([3,4]);
+    ctx.beginPath();
+    ctx.moveTo(padL, yFor(Rmax)); ctx.lineTo(W-padR, yFor(Rmax));
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // curve
+    ctx.beginPath();
+    history.forEach((v,i)=>{
+      const x = padL + (i/(maxPoints-1))*plotW;
+      const y = yFor(v);
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    const grad = ctx.createLinearGradient(0,0,W,0);
+    grad.addColorStop(0, '#4fb8ff');
+    grad.addColorStop(1, actuatorOn ? '#46f2c0' : '#ff7a54');
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 2.2;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // current value dot
+    if(history.length){
+      const lastX = padL + ((history.length-1)/(maxPoints-1))*plotW;
+      const lastY = yFor(history[history.length-1]);
+      ctx.beginPath();
+      ctx.arc(lastX, lastY, 3.4, 0, Math.PI*2);
+      ctx.fillStyle = actuatorOn ? '#46f2c0' : '#ff7a54';
+      ctx.fill();
+    }
+
+    requestAnimationFrame(draw);
+  }
+  resize();
+  draw();
+})();
+
+/* ============ THERMAL PLUME: advection-diffusion rings ============ */
+(function(){
+  const canvas = document.getElementById('plumeCanvas');
+  const ctx = canvas.getContext('2d');
+  let DPR, W, H;
+  function resize(){
+    DPR = Math.min(window.devicePixelRatio||1,2);
+    W = canvas.clientWidth; H = canvas.clientHeight;
+    canvas.width = W*DPR; canvas.height = H*DPR;
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const rings = Array.from({length:8}, (_,i)=>({phase:i/8}));
+  let t=0;
+  function draw(){
+    t += 0.004;
+    ctx.clearRect(0,0,W,H);
+    const cx = W*0.5, cy = H*0.5;
+    const maxR = Math.min(W,H)*0.46;
+
+    rings.forEach(ring=>{
+      const p = (ring.phase + t) % 1;
+      const r = p*maxR;
+      const deltaT = Math.exp(-p*3.1); // ΔT(r) = ΔT0 * e^(-r/L), L normalized
+      const warm = deltaT;
+      const rr = Math.round(79 + warm*(255-79));
+      const gg = Math.round(184 + warm*(122-184));
+      const bb = Math.round(255 + warm*(84-255));
+      ctx.beginPath();
+      ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.strokeStyle = `rgba(${rr},${gg},${bb},${0.55*(1-p)})`;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    });
+
+    // outlet core
+    ctx.beginPath();
+    ctx.arc(cx,cy,7,0,Math.PI*2);
+    ctx.fillStyle = '#ff7a54';
+    ctx.shadowColor = '#ff7a54';
+    ctx.shadowBlur = 18;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ============ CLOSED LOOP: node labels ============ */
+(function(){
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const g = document.getElementById('loopNodes');
+  const nodes = [
+    {label:'SENSOR', sub:'optical + thermal', angle:-90, color:'var(--accent-cold)'},
+    {label:'AI MODEL', sub:'fouling predictor', angle:0, color:'var(--accent-bio)'},
+    {label:'ACTUATOR', sub:'ultrasonic pulse', angle:90, color:'var(--accent-warm)'},
+    {label:'PHYSICAL EFFECT', sub:'growth rate ↓', angle:180, color:'var(--accent-bio)'}
+  ];
+  const R = 170, cx = 240, cy = 240;
+  nodes.forEach(n=>{
+    const rad = n.angle*Math.PI/180;
+    const x = cx + R*Math.cos(rad);
+    const y = cy + R*Math.sin(rad);
+    const circle = document.createElementNS(svgNS,'circle');
+    circle.setAttribute('cx',x); circle.setAttribute('cy',y); circle.setAttribute('r',26);
+    circle.setAttribute('fill','#071e2b');
+    circle.setAttribute('stroke',n.color);
+    circle.setAttribute('stroke-width','1.6');
+    g.appendChild(circle);
+
+    const text = document.createElementNS(svgNS,'text');
+    text.setAttribute('x',x); text.setAttribute('y', y + (n.angle===-90? -40 : n.angle===90? 52 : 5));
+    text.setAttribute('text-anchor','middle');
+    text.setAttribute('font-family',"IBM Plex Mono, monospace");
+    text.setAttribute('font-size','11');
+    text.setAttribute('fill','#eaf6f3');
+    text.textContent = n.label;
+    if(n.angle===180){ text.setAttribute('x', x-46); text.setAttribute('text-anchor','end'); }
+    if(n.angle===0){ text.setAttribute('x', x+46); text.setAttribute('text-anchor','start'); }
+    g.appendChild(text);
+
+    const sub = document.createElementNS(svgNS,'text');
+    sub.setAttribute('x', text.getAttribute('x'));
+    sub.setAttribute('y', parseFloat(text.getAttribute('y'))+14);
+    sub.setAttribute('text-anchor', text.getAttribute('text-anchor'));
+    sub.setAttribute('font-family',"IBM Plex Mono, monospace");
+    sub.setAttribute('font-size','9');
+    sub.setAttribute('fill','#8fb4bc');
+    sub.textContent = n.sub;
+    g.appendChild(sub);
+  });
+})();
+</script>
+</body>
+</html>

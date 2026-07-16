@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaShield — Smart Eco-Cooling & Marine Protection Retrofit</title>
+    <!-- SEO and Meta Tags -->
+    <meta name="description" content="Cinematic presentation of AquaShield, a smart eco-cooling and marine protection retrofit system for underwater data centers.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&family=Orbitron:wght@400;600;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Main Presentation Container (16:9 Lock) -->
+    <div id="app-container" class="aspect-ratio-16-9">
+        
+        <!-- WebGL Canvas for 3D Scene -->
+        <div id="canvas-container"></div>
+        
+        <!-- Ambient Water Reflections Overlay -->
+        <div class="water-vignette"></div>
+        
+        <!-- Cinematic Letterbox Bars -->
+        <div class="cinematic-bar top-bar">
+            <div class="hud-top-meta">
+                <span class="hud-meta-item"><span class="glow-dot red animate-blink"></span> REC</span>
+                <span class="hud-meta-item">SYS STATUS: RUNNING</span>
+            </div>
+        </div>
+        <div class="cinematic-bar bottom-bar">
+            <div class="hud-bottom-meta">
+                <span>LAT: 35.0116° N</span>
+                <span>LON: 135.7681° E</span>
+                <span>DEPTH: <span id="telemetry-depth-meta">0.0m</span></span>
+                <span>TEMP: <span id="telemetry-temp-meta">21.5°C</span></span>
+            </div>
+        </div>
+
+        <!-- 1. Intro Screen / Play Trigger -->
+        <div id="intro-screen" class="active">
+            <div class="intro-grid-bg"></div>
+            <div class="intro-content">
+                <div class="intro-badge">CONCEPT PROTOTYPE</div>
+                <h1 class="intro-main-title">AQUASHIELD</h1>
+                <p class="intro-subtitle">Smart Eco-Cooling & Marine Protection Retrofit for Underwater Data Centers</p>
+                <div class="intro-divider"></div>
+                <p class="intro-action-text">This experience uses synthesized spatial audio. Enable sound for the full cinematic experience.</p>
+                <div class="intro-btn-group">
+                    <button id="btn-launch-audio" class="glitch-btn font-orbitron">
+                        <span class="btn-glow"></span>
+                        LAUNCH WITH AUDIO
+                    </button>
+                    <button id="btn-launch-silent" class="glitch-btn secondary font-orbitron">
+                        LAUNCH SILENT
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Cinematic Title Overlay (Revealed During Animation) -->
+        <div id="cinematic-title-overlay" class="hidden">
+            <div class="title-wrapper">
+                <div class="title-bracket-left"></div>
+                <div class="title-text-content">
+                    <h1 class="main-glow-title">AQUASHIELD</h1>
+                    <div class="title-sub-bar"></div>
+                    <p class="main-glow-subtitle">SMART ECO-COOLING & MARINE PROTECTION RETROFIT</p>
+                    <p class="main-glow-subtext">FOR UNDERWATER DATA CENTERS</p>
+                </div>
+                <div class="title-bracket-right"></div>
+            </div>
+        </div>
+
+        <!-- 3. Futuristic Telemetry HUD (Active after title sequence) -->
+        <div id="hud-dashboard" class="hud-hidden">
+            
+            <!-- Left Telemetry Panel -->
+            <div class="hud-panel left-panel">
+                <div class="hud-panel-header">
+                    <span class="panel-icon">▰</span> SYSTEM THERMALS
+                </div>
+                <div class="hud-panel-body">
+                    <div class="telemetry-item">
+                        <div class="tel-label">CORE TEMPERATURE</div>
+                        <div class="tel-value-row">
+                            <span class="tel-value" id="tel-core-temp">12.4</span>
+                            <span class="tel-unit">°C</span>
+                            <span class="tel-trend green" id="trend-temp">▼ 0.2°/s</span>
+                        </div>
+                        <div class="tel-bar-container">
+                            <div class="tel-bar green" id="tel-bar-temp" style="width: 25%"></div>
+                        </div>
+                    </div>
+                    <div class="telemetry-item">
+                        <div class="tel-label">COOLING EFFICIENCY</div>
+                        <div class="tel-value-row">
+                            <span class="tel-value" id="tel-cool-eff">98.7</span>
+                            <span class="tel-unit">%</span>
+                            <span class="tel-trend green" id="trend-eff">▲ OPTIMAL</span>
+                        </div>
+                        <div class="tel-bar-container">
+                            <div class="tel-bar teal" id="tel-bar-eff" style="width: 98%"></div>
+                        </div>
+                    </div>
+                    <div class="telemetry-item">
+                        <div class="tel-label">ECO-HEAT DISSIPATION</div>
+                        <div class="tel-value-row">
+                            <span class="tel-value" id="tel-heat-diss">4.2</span>
+                            <span class="tel-unit">MW</span>
+                            <span class="tel-trend green">STABLE</span>
+                        </div>
+                        <div class="tel-bar-container">
+                            <div class="tel-bar blue" id="tel-bar-heat" style="width: 42%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hud-panel-footer">
+                    <span>GRID REF: AS-EC-09</span>
+                    <span>SENSORS: ACTIVE</span>
+                </div>
+            </div>
+
+            <!-- Right Telemetry Panel -->
+            <div class="hud-panel right-panel">
+                <div class="hud-panel-header">
+                    <span class="panel-icon">▰</span> MARINE BIOME PROTECTION
+                </div>
+                <div class="hud-panel-body">
+                    <div class="telemetry-item">
+                        <div class="tel-label">ECO-SHIELD INTEGRITY</div>
+                        <div class="tel-value-row">
+                            <span class="tel-value" id="tel-shield">100.0</span>
+                            <span class="tel-unit">%</span>
+                            <span class="tel-trend green">SECURE</span>
+                        </div>
+                        <div class="tel-bar-container">
+                            <div class="tel-bar green" id="tel-bar-shield" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="telemetry-item">
+                        <div class="tel-label">ACOUSTIC BAFFLING</div>
+                        <div class="tel-value-row">
+                            <span class="tel-value" id="tel-acoustics">-22.4</span>
+                            <span class="tel-unit">dB</span>
+                            <span class="tel-trend green" id="trend-acoustics">SAFE LIMIT</span>
+                        </div>
+                        <div class="tel-bar-container">
+                            <div class="tel-bar teal" id="tel-bar-acoustics" style="width: 78%"></div>
+                        </div>
+                    </div>
+                    <div class="hud-sub-log-header">BIOME MONITORING DATA</div>
+                    <div id="hud-marine-logs" class="hud-console-logs">
+                        <!-- Dynamic logs go here -->
+                    </div>
+                </div>
+                <div class="hud-panel-footer">
+                    <span>SHIELD LEVEL: 4</span>
+                    <span>RADAR: SCANNING</span>
+                </div>
+            </div>
+
+            <!-- User Control Controls (Float Bottom) -->
+            <div id="hud-controls-container">
+                <button id="btn-replay" class="hud-ctrl-btn" title="Replay Cinematic Sequence">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                    <span>REPLAY</span>
+                </button>
+                <div class="hud-ctrl-divider"></div>
+                <button id="btn-overview" class="hud-ctrl-btn active" title="Show Main System Telemetry HUD">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="3"/><line x1="15" y1="1" x2="15" y2="3"/><line x1="9" y1="21" x2="9" y2="23"/><line x1="15" y1="21" x2="15" y2="23"/><line x1="21" y1="9" x2="23" y2="9"/><line x1="21" y1="15" x2="23" y2="15"/><line x1="1" y1="9" x2="3" y2="9"/><line x1="1" y1="15" x2="3" y2="15"/></svg>
+                    <span>SYSTEM HUD</span>
+                </button>
+                <button id="btn-schematic" class="hud-ctrl-btn" title="Toggle Educational Physics Schematic">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                    <span>THERMAL FLOW</span>
+                </button>
+                <button id="btn-impact" class="hud-ctrl-btn" title="Show Exhaust Thermal Impact Analysis">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span>IMPACT ANALYSIS</span>
+                </button>
+                <button id="btn-retrofit" class="hud-ctrl-btn" title="Show AquaShield Retrofit Installation">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 11 11 13 15 9"/></svg>
+                    <span>RETROFIT DEPLOY</span>
+                </button>
+                <button id="btn-comparison" class="hud-ctrl-btn" title="Show Split-Screen Performance Comparison">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+                    <span>COMPARISON VIEW</span>
+                </button>
+                <button id="btn-eco" class="hud-ctrl-btn" title="Show Ecological Eco-Harmony View">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    <span>ECO HARMONY</span>
+                </button>
+                <button id="btn-benefits" class="hud-ctrl-btn" title="Show Holographic Benefits Dashboard">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83M22 12A10 10 0 0 0 12 2v10z"/></svg>
+                    <span>BENEFITS HUD</span>
+                </button>
+                <button id="btn-prototype" class="hud-ctrl-btn" title="Show Student Hardware Prototype Demo">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2" ry="2"/><line x1="6" y1="2" x2="6" y2="22"/><line x1="18" y1="2" x2="18" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="6" x2="6" y2="6"/><line x1="2" y1="18" x2="6" y2="18"/><line x1="18" y1="6" x2="22" y2="6"/><line x1="18" y1="18" x2="22" y2="18"/></svg>
+                    <span>PROTOTYPE DEMO</span>
+                </button>
+                <button id="btn-conclusion" class="hud-ctrl-btn" title="Play Conclusion Outro Cinematic">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+                    <span>OUTRO</span>
+                </button>
+                <button id="btn-tritonskin" class="hud-ctrl-btn" title="View TritonSkin Interactive Presentation" onclick="window.location.href='tritonskin.html'">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 11 11 13 15 9"/></svg>
+                    <span>TRITONSKIN 2D</span>
+                </button>
+                <div class="hud-ctrl-divider"></div>
+                <button id="btn-toggle-grid" class="hud-ctrl-btn active" title="Toggle Science Overlay Grid">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg>
+                    <span>GRID OVERLAY</span>
+                </button>
+                <button id="btn-mute" class="hud-ctrl-btn" title="Mute Spatial Audio">
+                    <svg id="svg-volume-on" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                    <svg id="svg-volume-off" class="hidden" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                    <span>AUDIO</span>
+                </button>
+                <button id="btn-orbit" class="hud-ctrl-btn" title="Enable Manual Orbit Camera Controls">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+                    <span id="btn-orbit-text">FREE ORBIT</span>
+                </button>
+            </div>
+            
+        </div>
+
+        <!-- 4. Educational Physics Annotations Overlay -->
+        <div id="physics-annotations" class="hud-hidden">
+            <!-- Label 1: Main Concept -->
+            <div class="annotation-card main-concept-label">
+                <div class="annotation-title font-orbitron">EXISTING UNDERWATER DATA CENTER</div>
+                <div class="annotation-text">Concept inspired by real-world sea deployments (e.g., Project Natick)</div>
+            </div>
+
+            <!-- Label 2: Dry Sealed Vessel -->
+            <div class="annotation-card annotation-point label-vessel">
+                <div class="annotation-dot"></div>
+                <div class="annotation-line-h line-left"></div>
+                <div class="annotation-title font-orbitron">DRY SEALED VESSEL</div>
+                <div class="annotation-text">Servers operate in 1 atm dry nitrogen gas. Safe from seawater contact.</div>
+            </div>
+
+            <!-- Label 3: Cold Current -->
+            <div class="annotation-card annotation-point label-current">
+                <div class="annotation-dot dot-left"></div>
+                <div class="annotation-line-h line-right"></div>
+                <div class="annotation-title font-orbitron">COLD SEAWATER INTAKE</div>
+                <div class="annotation-text">Natural ambient currents drag heat away through conduction.</div>
+            </div>
+
+            <!-- Label 4: Thermal Plume -->
+            <div class="annotation-card annotation-point label-plume">
+                <div class="annotation-dot dot-bottom"></div>
+                <div class="annotation-line-v line-bottom"></div>
+                <div class="annotation-title font-orbitron">THERMAL PLUME DISSIPATION</div>
+                <div class="annotation-text">Warm return water exits exhaust duct, rising safely. Fish deflect around plume.</div>
+            </div>
+        </div>
+
+        <!-- 5. Educational Impact Annotations Overlay -->
+        <div id="impact-annotations" class="hud-hidden">
+            <!-- Main Title Concept -->
+            <div class="annotation-card main-concept-label warning-theme">
+                <div class="annotation-title font-orbitron">THERMAL INFLUENCE DIAGNOSTIC</div>
+                <div class="annotation-text">Close-up tracking of unmitigated heat dissipation from data center cooling exhaust.</div>
+            </div>
+
+            <!-- Callout 1: Energy Waste -->
+            <div class="annotation-card annotation-point label-energy">
+                <div class="annotation-dot"></div>
+                <div class="annotation-line-h line-left"></div>
+                <div class="annotation-title font-orbitron">ENERGY WASTE</div>
+                <div class="annotation-text">Heat expelled directly into the environment represents uncaptured thermal load from electrical losses.</div>
+            </div>
+
+            <!-- Callout 2: Thermal Pollution -->
+            <div class="annotation-card annotation-point label-pollution">
+                <div class="annotation-dot dot-left"></div>
+                <div class="annotation-line-h line-right"></div>
+                <div class="annotation-title font-orbitron">THERMAL POLLUTION</div>
+                <div class="annotation-text">Localized temperature increase alterations modify local micro-habitat chemistry and parameter ranges.</div>
+            </div>
+
+            <!-- Callout 3: Manual Monitoring -->
+            <div class="annotation-card annotation-point label-monitoring">
+                <div class="annotation-dot dot-bottom"></div>
+                <div class="annotation-line-v line-bottom"></div>
+                <div class="annotation-title font-orbitron">MANUAL MONITORING</div>
+                <div class="annotation-text">Conventional operations rely on active manual sweeps and static sensors to trace thermal plume boundaries.</div>
+            </div>
+        </div>
+
+        <!-- 6. Educational Retrofit Annotations Overlay -->
+        <div id="retrofit-annotations" class="hud-hidden">
+            <!-- Main Title Concept with AI Icon -->
+            <div class="annotation-card main-concept-label solution-theme label-ai-badge">
+                <div class="ai-badge-row">
+                    <svg class="ai-icon animate-pulse-glow" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <rect x="9" y="9" width="6" height="6"/>
+                        <line x1="9" y1="1" x2="9" y2="3"/>
+                        <line x1="15" y1="1" x2="15" y2="3"/>
+                        <line x1="9" y1="21" x2="9" y2="23"/>
+                        <line x1="15" y1="21" x2="15" y2="23"/>
+                        <line x1="21" y1="9" x2="23" y2="9"/>
+                        <line x1="21" y1="15" x2="23" y2="15"/>
+                        <line x1="1" y1="9" x2="3" y2="9"/>
+                        <line x1="1" y1="15" x2="3" y2="15"/>
+                    </svg>
+                    <div class="ai-badge-text font-orbitron">RETROFIT — NO REDESIGN REQUIRED</div>
+                </div>
+                <div class="annotation-text" style="margin-top: 8px;">Direct external attachment to existing pressure hulls. Zero structural changes or internal hardware alterations.</div>
+            </div>
+
+            <!-- Callout 1: Smart Edge Controller -->
+            <div class="annotation-card annotation-point label-edge">
+                <div class="annotation-dot"></div>
+                <div class="annotation-line-h line-left"></div>
+                <div class="annotation-title font-orbitron">AI EDGE CONTROLLER</div>
+                <div class="annotation-text">Glows softly to indicate active logic. Dynamically modulates flow rates and acoustic frequency dampening.</div>
+            </div>
+
+            <!-- Callout 2: Micro-Sensors -->
+            <div class="annotation-card annotation-point label-sensors">
+                <div class="annotation-dot dot-left"></div>
+                <div class="annotation-line-h line-right"></div>
+                <div class="annotation-title font-orbitron">FLOW & TEMP SENSORS</div>
+                <div class="annotation-text">Spins and blinks to record parameters. Real-time temperature gradient and current rate monitoring.</div>
+            </div>
+
+            <!-- Callout 3: Hull Clamps -->
+            <div class="annotation-card annotation-point label-clamp">
+                <div class="annotation-dot dot-bottom"></div>
+                <div class="annotation-line-v line-bottom"></div>
+                <div class="annotation-title font-orbitron">CLAMP-ON MOUNT</div>
+                <div class="annotation-text">Chassis clips externally onto the existing pod support columns with zero hull penetrations.</div>
+            </div>
+        </div>
+
+        <!-- 7. Educational Comparison Overlays (Split-Screen before/after) -->
+        <div id="comparison-overlays" class="hud-hidden">
+            <!-- Central Divider line -->
+            <div class="comparison-split-line"></div>
+
+            <!-- Left header label -->
+            <div class="comparison-header-label left-side-header">
+                <span class="glow-dot red animate-blink"></span>
+                <span>BEFORE: CONVENTIONAL FIXED COOLING</span>
+            </div>
+
+            <!-- Right header label -->
+            <div class="comparison-header-label right-side-header">
+                <span class="glow-dot teal animate-pulse-glow"></span>
+                <span>AFTER: AQUASHIELD ADAPTIVE DAMPENING</span>
+            </div>
+
+            <!-- Centered Performance Metrics Card -->
+            <div class="comparison-metrics-card">
+                <div class="comp-card-header font-orbitron">RETROFIT PERFORMANCE DIAGNOSTICS</div>
+                <div class="comp-metrics-row">
+                    <div class="comp-metric-item">
+                        <div class="comp-metric-val green">-18%</div>
+                        <div class="comp-metric-lbl font-orbitron">PUMP ENERGY</div>
+                    </div>
+                    <div class="comp-metric-item">
+                        <div class="comp-metric-val teal">LOWER</div>
+                        <div class="comp-metric-lbl font-orbitron">THERMAL PLUME</div>
+                    </div>
+                    <div class="comp-metric-item">
+                        <div class="comp-metric-val blue">STABLE</div>
+                        <div class="comp-metric-lbl font-orbitron">SERVER TEMP</div>
+                    </div>
+                </div>
+                <div class="comp-card-footer">*Simulation / concept demonstration data values</div>
+            </div>
+        </div>
+
+        <!-- 8. Educational Eco-Harmony Annotations Overlay -->
+        <div id="eco-annotations" class="hud-hidden">
+            <!-- Centralized Eco Badge Card with Leaf Icon -->
+            <div class="annotation-card main-concept-label solution-theme label-eco-harmony">
+                <div class="ai-badge-row">
+                    <svg class="eco-leaf-icon animate-pulse-glow" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 3.5 1 9.8a7 7 0 0 1-9 8.2z"/>
+                        <path d="M19 2L9.8 11.2"/>
+                    </svg>
+                    <div class="ai-badge-text font-orbitron">REDUCED THERMAL STRESS ON MARINE LIFE</div>
+                </div>
+                <div class="annotation-text" style="margin-top: 8px;">Adaptive thermal dissipation keeps exhaust temperatures within local ambient parameters, restoring natural migration patterns and protecting benthic ecosystems.</div>
+            </div>
+        </div>
+
+        <!-- 9. Educational Benefits Holographic Dashboard Overlay -->
+        <div id="benefits-annotations" class="hud-hidden">
+            <div class="hologram-board">
+                <div class="hologram-header font-orbitron">AQUASHIELD BENEFITS ANALYTICS</div>
+                
+                <!-- Metrics Grid -->
+                <div class="hologram-section-title font-orbitron">OPERATIONAL TELEMETRY</div>
+                <div class="hologram-metrics-grid">
+                    <div class="holo-metric-item">
+                        <div class="holo-lbl">SERVER TEMP</div>
+                        <div class="holo-val-row">
+                            <span class="holo-val green">18.2 °C</span>
+                            <span class="holo-status font-orbitron green-bg">STABLE</span>
+                        </div>
+                    </div>
+                    <div class="holo-metric-item">
+                        <div class="holo-lbl">SYSTEM UPTIME</div>
+                        <div class="holo-val-row">
+                            <span class="holo-val green">99.998%</span>
+                            <span class="holo-status font-orbitron green-bg">NOMINAL</span>
+                        </div>
+                    </div>
+                    <div class="holo-metric-item">
+                        <div class="holo-lbl">ENERGY DEMAND</div>
+                        <div class="holo-val-row">
+                            <span class="holo-val green">-18.4%</span>
+                            <span class="holo-status font-orbitron green-bg">OPTIMIZED</span>
+                        </div>
+                    </div>
+                    <div class="holo-metric-item">
+                        <div class="holo-lbl">MAINTENANCE STATUS</div>
+                        <div class="holo-val-row">
+                            <span class="holo-val green">AUTO</span>
+                            <span class="holo-status font-orbitron green-bg">PREDICTIVE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Benefits List -->
+                <div class="hologram-section-title font-orbitron">VALUE PROPOSITION</div>
+                <div class="holo-benefits-list">
+                    <div class="holo-benefit-card">
+                        <div class="holo-benefit-title font-orbitron">LOWER COOLING COST</div>
+                        <div class="holo-benefit-desc">Decreased parasitic pump load yields immediate utility savings.</div>
+                    </div>
+                    <div class="holo-benefit-card">
+                        <div class="holo-benefit-title font-orbitron">LESS DOWNTIME</div>
+                        <div class="holo-benefit-desc">Continuous predictive cleaning safeguards casing thermals.</div>
+                    </div>
+                    <div class="holo-benefit-card">
+                        <div class="holo-benefit-title font-orbitron">REMOTE MONITORING</div>
+                        <div class="holo-benefit-desc">Edge telemetry pipelines log parameters without manual dives.</div>
+                    </div>
+                    <div class="holo-benefit-card">
+                        <div class="holo-benefit-title font-orbitron">LONGER EQUIPMENT LIFE</div>
+                        <div class="holo-benefit-desc">Minimized thermal cycling limits mechanical stress.</div>
+                    </div>
+                </div>
+                <div class="hologram-footer">*Demonstration performance statistics values</div>
+            </div>
+        </div>
+
+        <!-- 10. Educational Student Prototype Annotations Overlay -->
+        <div id="prototype-annotations" class="hud-hidden">
+            <!-- Centralized Prototype Badge Card -->
+            <div class="annotation-card main-concept-label solution-theme label-proto-badge">
+                <div class="ai-badge-row">
+                    <svg class="eco-leaf-icon animate-pulse-glow" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="4" width="20" height="16" rx="2"/>
+                        <path d="M10 4V2h4v2M10 20v2h4v-2M18 8h2M18 12h2M18 16h2M4 8h2M4 12h2M4 16h2"/>
+                    </svg>
+                    <div class="ai-badge-text font-orbitron">STUDENT PROTOTYPE — BUDGET UNDER ₹15,000</div>
+                </div>
+                <div class="annotation-text" style="margin-top: 8px;">Bright classroom laboratory workbench. Miniature hardware mockups testing algorithmic feedback loops on physical components.</div>
+            </div>
+
+            <!-- Callout 1: ESP32 Microcontroller -->
+            <div class="annotation-card annotation-point label-proto-esp">
+                <div class="annotation-dot"></div>
+                <div class="annotation-line-h line-left"></div>
+                <div class="annotation-title font-orbitron">ESP32 CONTROLLER</div>
+                <div class="annotation-text">Low-cost microcontroller running adaptive fluid velocity algorithms. Connected to telemetry lines.</div>
+            </div>
+
+            <!-- Callout 2: Submersed Casing -->
+            <div class="annotation-card annotation-point label-proto-tank">
+                <div class="annotation-dot dot-left"></div>
+                <div class="annotation-line-h line-right"></div>
+                <div class="annotation-title font-orbitron">SUBMERSED VESSEL & PUMP</div>
+                <div class="annotation-text">Miniature aluminum case submerged inside a glass aquarium tank, simulating marine conduction.</div>
+            </div>
+
+            <!-- Callout 3: Digital Twin Dashboard -->
+            <div class="annotation-card annotation-point label-proto-twin">
+                <div class="annotation-dot dot-bottom"></div>
+                <div class="annotation-line-v line-bottom"></div>
+                <div class="annotation-title font-orbitron">DIGITAL TWIN DASHBOARD</div>
+                <div class="annotation-text">Laptop dashboard receives WebSocket variables from the ESP32 board, mirroring active temperatures.</div>
+            </div>
+        </div>
+
+        <!-- 11. Outro & Conclusion Cinematic Overlays -->
+        <div id="conclusion-overlay" class="hud-hidden">
+            <div class="conclusion-content">
+                <h1 class="font-orbitron text-glow">AquaShield — Better for Fish, Better for Humans, Better for Data</h1>
+                <p class="font-orbitron subtitle">Low-cost AI retrofit for sustainable underwater data centers</p>
+            </div>
+        </div>
+
+        <div id="black-out-screen" class="hud-hidden">
+            <button id="btn-restart-presentation" class="font-orbitron">RESTART PRESENTATION</button>
+        </div>
+    </div>
+    </div>
+
+    <!-- Script imports (Three.js and GSAP libraries) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OrbitControls for Three.js (for post-cinematic camera look around) -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- GSAP for timeline animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <!-- Main Logic script -->
+    <script src="main.js"></script>
+</body>
+</html>
