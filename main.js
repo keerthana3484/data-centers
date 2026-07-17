@@ -1,3 +1,33 @@
+// Global error logging overlay for debugging
+(function() {
+    const errorBox = document.createElement("div");
+    errorBox.id = "debug-error-console";
+    errorBox.style.position = "absolute";
+    errorBox.style.top = "10px";
+    errorBox.style.left = "10px";
+    errorBox.style.right = "10px";
+    errorBox.style.maxHeight = "180px";
+    errorBox.style.overflowY = "auto";
+    errorBox.style.backgroundColor = "rgba(220, 20, 60, 0.95)";
+    errorBox.style.color = "white";
+    errorBox.style.fontFamily = "monospace";
+    errorBox.style.fontSize = "11px";
+    errorBox.style.padding = "10px";
+    errorBox.style.borderRadius = "4px";
+    errorBox.style.zIndex = "99999";
+    errorBox.style.display = "none";
+    errorBox.style.pointerEvents = "auto";
+    errorBox.style.border = "2px solid #ff3344";
+    errorBox.style.boxShadow = "0 4px 15px rgba(0,0,0,0.5)";
+    document.body.appendChild(errorBox);
+
+    window.addEventListener("error", function(e) {
+        errorBox.style.display = "block";
+        errorBox.innerHTML += `<div><strong>Runtime Error:</strong> ${e.message} <br><em>File: ${e.filename} (Line ${e.lineno}, Col ${e.colno})</em></div><hr style="border-color: rgba(255,255,255,0.2); margin: 6px 0;">`;
+        errorBox.scrollTop = errorBox.scrollHeight;
+    });
+})();
+
 // AquaShield - Cinematic Animated Opening and Telemetry HUD
 // Built with Three.js, GSAP, and Web Audio API
 
