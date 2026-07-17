@@ -66,7 +66,7 @@ const camTarget = new THREE.Vector3(0, 5, -250);
 // Initialize UI Event Listeners
 document.addEventListener("DOMContentLoaded", () => {
     // If buttons or overlays were removed, create dummy fallback elements to prevent crashes in event handlers
-    ["btn-conclusion", "conclusion-overlay", "black-out-screen", "btn-restart-presentation"].forEach(id => {
+    ["btn-conclusion", "conclusion-overlay", "black-out-screen", "btn-restart-presentation", "btn-impact", "btn-retrofit", "impact-annotations", "retrofit-annotations"].forEach(id => {
         if (!document.getElementById(id)) {
             const dummy = document.createElement("div");
             dummy.id = id;
