@@ -2,7 +2,7 @@
 // Built with Three.js, GSAP, and Web Audio API
 
 // Global Application State
-let scene, camera, renderer, orbitControls;
+let scene, camera, renderer, orbitControls, introTimeline;
 let waterMaterial, waterPlane, skyDome;
 let marineSnow, bubbleSystems = [], godRays;
 let dataCenterGroup, scanningGrid;
@@ -99,27 +99,35 @@ document.addEventListener("DOMContentLoaded", () => {
         toggleOrbitControls(e.currentTarget);
     });
     document.getElementById("btn-overview").addEventListener("click", () => {
+        if (isCinematicRunning) skipCinematic();
         toggleOverviewMode();
     });
     document.getElementById("btn-schematic").addEventListener("click", () => {
+        if (isCinematicRunning) skipCinematic();
         toggleSchematicMode();
     });
     document.getElementById("btn-impact").addEventListener("click", () => {
+        if (isCinematicRunning) skipCinematic();
         toggleImpactMode();
     });
     document.getElementById("btn-retrofit").addEventListener("click", () => {
+        if (isCinematicRunning) skipCinematic();
         toggleRetrofitMode();
     });
     document.getElementById("btn-comparison").addEventListener("click", () => {
+        if (isCinematicRunning) skipCinematic();
         toggleComparisonMode();
     });
     document.getElementById("btn-eco").addEventListener("click", () => {
+        if (isCinematicRunning) skipCinematic();
         toggleEcoMode();
     });
     document.getElementById("btn-benefits").addEventListener("click", () => {
+        if (isCinematicRunning) skipCinematic();
         toggleBenefitsMode();
     });
     document.getElementById("btn-prototype").addEventListener("click", () => {
+        if (isCinematicRunning) skipCinematic();
         togglePrototypeMode();
     });
     document.getElementById("btn-conclusion").addEventListener("click", () => {
@@ -1064,6 +1072,7 @@ function startCinematic() {
             completeCinematicSequence();
         }
     });
+    introTimeline = timeline;
     
     // 0s - 3.5s: Gentle glide forward above surface looking at sunrise
     timeline.to(camera.position, {
@@ -1195,6 +1204,52 @@ function triggerSplashTransition() {
     
     addLogLine("CRITICAL ALTITUDE EXCEEDED: Splashdown.");
     addLogLine("Coolant shield integrity: SECURE.");
+}
+
+function skipCinematic() {
+    isCinematicRunning = false;
+    
+    // Stop any GSAP animations on camera and targets
+    gsap.killTweensOf(camera.position);
+    gsap.killTweensOf(camTarget);
+    
+    // Kill the intro timeline
+    if (introTimeline) {
+        introTimeline.kill();
+    }
+    
+    // Hide launch overlay
+    const launchOverlay = document.getElementById("launch-overlay");
+    if (launchOverlay) {
+        launchOverlay.classList.remove("hud-visible");
+        launchOverlay.classList.add("hud-hidden");
+    }
+    
+    // Hide title overlay
+    const titleOverlay = document.getElementById("cinematic-title-overlay");
+    if (titleOverlay) {
+        titleOverlay.classList.remove("visible");
+        titleOverlay.classList.add("hidden");
+    }
+    
+    // Show HUD dashboard
+    const dashboard = document.getElementById("hud-dashboard");
+    if (dashboard) {
+        dashboard.classList.remove("hud-hidden");
+        dashboard.classList.add("hud-visible");
+    }
+    
+    // Instantly splashdown if not already done
+    triggerSplashTransition();
+    
+    // Position camera at default overview parameters
+    camera.position.set(8, -44, -96);
+    camTarget.set(-5, -47, -122);
+    
+    // Start telemetry simulation
+    startTelemetrySimulation();
+    
+    addLogLine("Cinematic skipped by user interaction.");
 }
 
 // Cinematic finished - Boot HUD dashboard
