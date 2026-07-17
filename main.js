@@ -1721,6 +1721,7 @@ function animate() {
         renderer.setScissorTest(false);
     } else {
         // Standard fullscreen render
+        renderer.setScissorTest(false);
         renderer.setViewport(0, 0, renderer.domElement.clientWidth, renderer.domElement.clientHeight);
         renderer.render(scene, camera);
     }
