@@ -1218,11 +1218,10 @@ function skipCinematic() {
         introTimeline.kill();
     }
     
-    // Hide launch overlay
-    const launchOverlay = document.getElementById("launch-overlay");
-    if (launchOverlay) {
-        launchOverlay.classList.remove("hud-visible");
-        launchOverlay.classList.add("hud-hidden");
+    // Hide intro screen
+    const introScreen = document.getElementById("intro-screen");
+    if (introScreen) {
+        introScreen.classList.add("fade-out");
     }
     
     // Hide title overlay
