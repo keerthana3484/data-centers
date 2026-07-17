@@ -429,6 +429,7 @@ function init3D() {
     const sunLight = new THREE.DirectionalLight(0xffaa66, 1.8); // warm sunrise light
     sunLight.position.set(0, 5, -280);
     sunLight.castShadow = true;
+    sunLight.name = "sunLight";
     scene.add(sunLight);
     
     // Under-ocean cooling blue fill lights (reveal when submerged)
