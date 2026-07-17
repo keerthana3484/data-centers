@@ -65,6 +65,16 @@ const camTarget = new THREE.Vector3(0, 5, -250);
 
 // Initialize UI Event Listeners
 document.addEventListener("DOMContentLoaded", () => {
+    // If buttons or overlays were removed, create dummy fallback elements to prevent crashes in event handlers
+    ["btn-conclusion", "conclusion-overlay", "black-out-screen", "btn-restart-presentation"].forEach(id => {
+        if (!document.getElementById(id)) {
+            const dummy = document.createElement("div");
+            dummy.id = id;
+            dummy.style.display = "none";
+            document.body.appendChild(dummy);
+        }
+    });
+
     // Launch buttons
     document.getElementById("btn-launch-audio").addEventListener("click", () => {
         initAudio(true);
@@ -1635,7 +1645,7 @@ function animate() {
     }
     
     // 5.8 Render camera pass
-    if (isCinematicRunning) {
+    if (isCinematicRunning || !orbitControlsEnabled) {
         camera.lookAt(camTarget);
     }
     
@@ -2358,6 +2368,15 @@ function toggleRetrofitMode() {
     blackScreen.classList.remove("hud-visible");
     blackScreen.classList.add("hud-hidden");
     
+    // Hide tabletop prototype elements
+    if (classroomLight) classroomLight.intensity = 0.0;
+    if (prototypeGroup) prototypeGroup.visible = false;
+    
+    // Restore marine life if hidden
+    fishSchools.forEach(school => school.group.visible = true);
+    bubbleSystems.forEach(sys => sys.mesh.material.opacity = 0.7);
+    marineSnow.material.opacity = 0.8;
+    
     // Zoom close-up onto central retrofit mount zone (4, -44, -120)
     gsap.to(camera.position, {
         x: 6.5,
@@ -2507,6 +2526,15 @@ function toggleComparisonMode() {
     blackScreen.classList.remove("hud-visible");
     blackScreen.classList.add("hud-hidden");
     
+    // Hide tabletop prototype elements
+    if (classroomLight) classroomLight.intensity = 0.0;
+    if (prototypeGroup) prototypeGroup.visible = false;
+    
+    // Restore marine life if hidden
+    fishSchools.forEach(school => school.group.visible = true);
+    bubbleSystems.forEach(sys => sys.mesh.material.opacity = 0.7);
+    marineSnow.material.opacity = 0.8;
+    
     // Camera position to frame central pod perfectly centered on division border
     gsap.to(camera.position, {
         x: 2.0,
@@ -2546,6 +2574,8 @@ function toggleComparisonMode() {
     
     addLogLine("Comparison View: ACTIVE.");
     addLogLine("Comparing Conventional fixed cooling vs. Adaptive AquaShield dampening...");
+}
+
 function toggleEcoMode() {
     if (isCinematicRunning) return;
     
@@ -2561,23 +2591,32 @@ function toggleEcoMode() {
     const btnOverview = document.getElementById("btn-overview");
     const btnSchematic = document.getElementById("btn-schematic");
     const btnImpact = document.getElementById("btn-impact");
+    const btnRetrofit = document.getElementById("btn-retrofit");
     const btnComparison = document.getElementById("btn-comparison");
     const btnEco = document.getElementById("btn-eco");
+    const btnBenefits = document.getElementById("btn-benefits");
+    const btnPrototype = document.getElementById("btn-prototype");
     const btnConclusion = document.getElementById("btn-conclusion");
     
     btnOverview.classList.remove("active");
     btnSchematic.classList.remove("active");
     btnImpact.classList.remove("active");
+    btnRetrofit.classList.remove("active");
     btnComparison.classList.remove("active");
     btnEco.classList.add("active");
+    btnBenefits.classList.remove("active");
+    btnPrototype.classList.remove("active");
     btnConclusion.classList.remove("active");
     
     const leftPanel = document.querySelector(".hud-panel.left-panel");
     const rightPanel = document.querySelector(".hud-panel.right-panel");
     const pAnnotations = document.getElementById("physics-annotations");
     const iAnnotations = document.getElementById("impact-annotations");
+    const rAnnotations = document.getElementById("retrofit-annotations");
     const cOverlays = document.getElementById("comparison-overlays");
     const eOverlays = document.getElementById("eco-annotations");
+    const bAnnotations = document.getElementById("benefits-annotations");
+    const prAnnotations = document.getElementById("prototype-annotations");
     const cOverlay = document.getElementById("conclusion-overlay");
     const blackScreen = document.getElementById("black-out-screen");
     
@@ -2597,10 +2636,16 @@ function toggleEcoMode() {
     pAnnotations.classList.add("hud-hidden");
     iAnnotations.classList.remove("hud-visible");
     iAnnotations.classList.add("hud-hidden");
+    rAnnotations.classList.remove("hud-visible");
+    rAnnotations.classList.add("hud-hidden");
     cOverlays.classList.remove("hud-visible");
     cOverlays.classList.add("hud-hidden");
     eOverlays.classList.remove("hud-hidden");
     eOverlays.classList.add("hud-visible");
+    bAnnotations.classList.remove("hud-visible");
+    bAnnotations.classList.add("hud-hidden");
+    prAnnotations.classList.remove("hud-visible");
+    prAnnotations.classList.add("hud-hidden");
     cOverlay.classList.remove("hud-visible");
     cOverlay.classList.add("hud-hidden");
     blackScreen.classList.remove("hud-visible");
@@ -2685,7 +2730,250 @@ function toggleEcoMode() {
     
     addLogLine("Eco-Harmony Mode: ACTIVE.");
     addLogLine("Monitoring biological recovery & temperature compliance...");
-};
+}
+
+function toggleBenefitsMode() {
+    if (isCinematicRunning) return;
+    
+    isSchematicMode = false;
+    isImpactMode = false;
+    isRetrofitMode = false;
+    isComparisonMode = false;
+    isEcoMode = false;
+    isBenefitsMode = true;
+    isPrototypeMode = false;
+    isConclusionMode = false;
+    
+    const btnOverview = document.getElementById("btn-overview");
+    const btnSchematic = document.getElementById("btn-schematic");
+    const btnImpact = document.getElementById("btn-impact");
+    const btnRetrofit = document.getElementById("btn-retrofit");
+    const btnComparison = document.getElementById("btn-comparison");
+    const btnEco = document.getElementById("btn-eco");
+    const btnBenefits = document.getElementById("btn-benefits");
+    const btnPrototype = document.getElementById("btn-prototype");
+    const btnConclusion = document.getElementById("btn-conclusion");
+    
+    btnOverview.classList.remove("active");
+    btnSchematic.classList.remove("active");
+    btnImpact.classList.remove("active");
+    btnRetrofit.classList.remove("active");
+    btnComparison.classList.remove("active");
+    btnEco.classList.remove("active");
+    btnBenefits.classList.add("active");
+    btnPrototype.classList.remove("active");
+    btnConclusion.classList.remove("active");
+    
+    const leftPanel = document.querySelector(".hud-panel.left-panel");
+    const rightPanel = document.querySelector(".hud-panel.right-panel");
+    const pAnnotations = document.getElementById("physics-annotations");
+    const iAnnotations = document.getElementById("impact-annotations");
+    const rAnnotations = document.getElementById("retrofit-annotations");
+    const cOverlays = document.getElementById("comparison-overlays");
+    const eOverlays = document.getElementById("eco-annotations");
+    const bAnnotations = document.getElementById("benefits-annotations");
+    const prAnnotations = document.getElementById("prototype-annotations");
+    const cOverlay = document.getElementById("conclusion-overlay");
+    const blackScreen = document.getElementById("black-out-screen");
+    
+    orbitControlsEnabled = false;
+    orbitControls.enabled = false;
+    document.getElementById("btn-orbit").classList.remove("active");
+    document.getElementById("btn-orbit-text").innerText = "FREE ORBIT";
+    
+    // Hide default panels
+    leftPanel.style.transform = "translateX(-350px)";
+    leftPanel.style.opacity = "0";
+    rightPanel.style.transform = "translateX(350px)";
+    rightPanel.style.opacity = "0";
+    
+    // Toggle overlays
+    pAnnotations.classList.remove("hud-visible");
+    pAnnotations.classList.add("hud-hidden");
+    iAnnotations.classList.remove("hud-visible");
+    iAnnotations.classList.add("hud-hidden");
+    rAnnotations.classList.remove("hud-visible");
+    rAnnotations.classList.add("hud-hidden");
+    cOverlays.classList.remove("hud-visible");
+    cOverlays.classList.add("hud-hidden");
+    eOverlays.classList.remove("hud-visible");
+    eOverlays.classList.add("hud-hidden");
+    bAnnotations.classList.remove("hud-hidden");
+    bAnnotations.classList.add("hud-visible");
+    prAnnotations.classList.remove("hud-visible");
+    prAnnotations.classList.add("hud-hidden");
+    cOverlay.classList.remove("hud-visible");
+    cOverlay.classList.add("hud-hidden");
+    blackScreen.classList.remove("hud-visible");
+    blackScreen.classList.add("hud-hidden");
+    
+    // Standard camera view
+    gsap.to(camera.position, {
+        x: 8,
+        y: -44,
+        z: -96,
+        duration: 1.8,
+        ease: "power2.inOut"
+    });
+    
+    gsap.to(camTarget, {
+        x: -5,
+        y: -47,
+        z: -122,
+        duration: 1.8,
+        ease: "power2.inOut"
+    });
+    
+    // Solid pod
+    if (centerPodMesh) {
+        gsap.to(centerPodMesh.material, {
+            opacity: 1.0,
+            duration: 1.5
+        });
+    }
+    
+    // Restore default fog parameters
+    if (scene.fog) {
+        gsap.to(scene.fog.color, { r: 0.023, g: 0.066, b: 0.129, duration: 1.5 });
+        gsap.to(scene.fog, { density: 0.015, duration: 1.5 });
+    }
+    const sunLight = scene.getObjectByName("sunLight");
+    if (sunLight) gsap.to(sunLight, { intensity: 1.5, duration: 1.5 });
+    if (classroomLight) classroomLight.intensity = 0.0;
+    if (prototypeGroup) prototypeGroup.visible = false;
+    
+    // Restore marine life
+    fishSchools.forEach(school => school.group.visible = true);
+    bubbleSystems.forEach(sys => sys.mesh.material.opacity = 0.5);
+    marineSnow.material.opacity = 0.8;
+    
+    // Hide specific modes' helper assets
+    if (coldWaterFlow) gsap.to(coldWaterFlow.material, { opacity: 0.0, size: 0.0, duration: 1.0 });
+    if (thermalPlume) gsap.to(thermalPlume.material, { opacity: 0.0, size: 0.0, duration: 1.0 });
+    if (retrofitGroup) retrofitGroup.visible = false;
+    if (window.heatmapRings) {
+        window.heatmapRings.forEach(r => r.mesh.material.opacity = 0.0);
+    }
+    
+    addLogLine("Benefits Hologram Dashboard: ACTIVE.");
+}
+
+function togglePrototypeMode() {
+    if (isCinematicRunning) return;
+    
+    isSchematicMode = false;
+    isImpactMode = false;
+    isRetrofitMode = false;
+    isComparisonMode = false;
+    isEcoMode = false;
+    isBenefitsMode = false;
+    isPrototypeMode = true;
+    isConclusionMode = false;
+    
+    const btnOverview = document.getElementById("btn-overview");
+    const btnSchematic = document.getElementById("btn-schematic");
+    const btnImpact = document.getElementById("btn-impact");
+    const btnRetrofit = document.getElementById("btn-retrofit");
+    const btnComparison = document.getElementById("btn-comparison");
+    const btnEco = document.getElementById("btn-eco");
+    const btnBenefits = document.getElementById("btn-benefits");
+    const btnPrototype = document.getElementById("btn-prototype");
+    const btnConclusion = document.getElementById("btn-conclusion");
+    
+    btnOverview.classList.remove("active");
+    btnSchematic.classList.remove("active");
+    btnImpact.classList.remove("active");
+    btnRetrofit.classList.remove("active");
+    btnComparison.classList.remove("active");
+    btnEco.classList.remove("active");
+    btnBenefits.classList.remove("active");
+    btnPrototype.classList.add("active");
+    btnConclusion.classList.remove("active");
+    
+    const leftPanel = document.querySelector(".hud-panel.left-panel");
+    const rightPanel = document.querySelector(".hud-panel.right-panel");
+    const pAnnotations = document.getElementById("physics-annotations");
+    const iAnnotations = document.getElementById("impact-annotations");
+    const rAnnotations = document.getElementById("retrofit-annotations");
+    const cOverlays = document.getElementById("comparison-overlays");
+    const eOverlays = document.getElementById("eco-annotations");
+    const bAnnotations = document.getElementById("benefits-annotations");
+    const prAnnotations = document.getElementById("prototype-annotations");
+    const cOverlay = document.getElementById("conclusion-overlay");
+    const blackScreen = document.getElementById("black-out-screen");
+    
+    orbitControlsEnabled = false;
+    orbitControls.enabled = false;
+    document.getElementById("btn-orbit").classList.remove("active");
+    document.getElementById("btn-orbit-text").innerText = "FREE ORBIT";
+    
+    // Hide dashboard
+    leftPanel.style.transform = "translateX(-350px)";
+    leftPanel.style.opacity = "0";
+    rightPanel.style.transform = "translateX(350px)";
+    rightPanel.style.opacity = "0";
+    
+    // Toggle overlays
+    pAnnotations.classList.remove("hud-visible");
+    pAnnotations.classList.add("hud-hidden");
+    iAnnotations.classList.remove("hud-visible");
+    iAnnotations.classList.add("hud-hidden");
+    rAnnotations.classList.remove("hud-visible");
+    rAnnotations.classList.add("hud-hidden");
+    cOverlays.classList.remove("hud-visible");
+    cOverlays.classList.add("hud-hidden");
+    eOverlays.classList.remove("hud-visible");
+    eOverlays.classList.add("hud-hidden");
+    bAnnotations.classList.remove("hud-visible");
+    bAnnotations.classList.add("hud-hidden");
+    prAnnotations.classList.remove("hud-hidden");
+    prAnnotations.classList.add("hud-visible");
+    cOverlay.classList.remove("hud-visible");
+    cOverlay.classList.add("hud-hidden");
+    blackScreen.classList.remove("hud-visible");
+    blackScreen.classList.add("hud-hidden");
+    
+    // Zoom onto tabletop prototype
+    gsap.to(camera.position, {
+        x: 42.0,
+        y: -4.0,
+        z: -48.0,
+        duration: 2.0,
+        ease: "power2.inOut"
+    });
+    
+    gsap.to(camTarget, {
+        x: 42.0,
+        y: -9.0,
+        z: -60.0,
+        duration: 2.0,
+        ease: "power2.inOut"
+    });
+    
+    // Tabletop lighting & environmental atmospheric fog (classroom style)
+    if (classroomLight) gsap.to(classroomLight, { intensity: 3.8, duration: 1.5 });
+    if (scene.fog) {
+        gsap.to(scene.fog.color, { r: 0.88, g: 0.91, b: 0.94, duration: 1.5 });
+        gsap.to(scene.fog, { density: 0.001, duration: 1.5 });
+    }
+    const sunLight = scene.getObjectByName("sunLight");
+    if (sunLight) gsap.to(sunLight, { intensity: 0.0, duration: 1.5 });
+    
+    if (prototypeGroup) prototypeGroup.visible = true;
+    
+    // Hide marine assets
+    fishSchools.forEach(school => school.group.visible = false);
+    bubbleSystems.forEach(sys => sys.mesh.material.opacity = 0.0);
+    marineSnow.material.opacity = 0.0;
+    
+    if (coldWaterFlow) gsap.to(coldWaterFlow.material, { opacity: 0.0, size: 0.0, duration: 1.0 });
+    if (thermalPlume) gsap.to(thermalPlume.material, { opacity: 0.0, size: 0.0, duration: 1.0 });
+    if (retrofitGroup) retrofitGroup.visible = false;
+    if (window.heatmapRings) {
+        window.heatmapRings.forEach(r => r.mesh.material.opacity = 0.0);
+    }
+    
+    addLogLine("Student Prototype Demo: ACTIVE.");
 }
 
 function playConclusionOutro() {
@@ -2706,7 +2994,7 @@ function playConclusionOutro() {
     
     const leftPanel = document.querySelector(".hud-panel.left-panel");
     const rightPanel = document.querySelector(".hud-panel.right-panel");
-    const bottomPanel = document.querySelector(".hud-panel.bottom-panel");
+    const bottomPanel = document.querySelector(".bottom-bar");
     const pAnnotations = document.getElementById("physics-annotations");
     const iAnnotations = document.getElementById("impact-annotations");
     const rAnnotations = document.getElementById("retrofit-annotations");
@@ -2828,7 +3116,7 @@ function playConclusionOutro() {
 function restartPresentation() {
     const leftPanel = document.querySelector(".hud-panel.left-panel");
     const rightPanel = document.querySelector(".hud-panel.right-panel");
-    const bottomPanel = document.querySelector(".hud-panel.bottom-panel");
+    const bottomPanel = document.querySelector(".bottom-bar");
     const cOverlay = document.getElementById("conclusion-overlay");
     const blackScreen = document.getElementById("black-out-screen");
     

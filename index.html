@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&family=Orbitron:wght@400;600;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <!-- Stylesheet -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1.1">
 </head>
 <body>
     <!-- Main Presentation Container (16:9 Lock) -->
@@ -199,10 +199,6 @@
                 <button id="btn-prototype" class="hud-ctrl-btn" title="Show Student Hardware Prototype Demo">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2" ry="2"/><line x1="6" y1="2" x2="6" y2="22"/><line x1="18" y1="2" x2="18" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="6" x2="6" y2="6"/><line x1="2" y1="18" x2="6" y2="18"/><line x1="18" y1="6" x2="22" y2="6"/><line x1="18" y1="18" x2="22" y2="18"/></svg>
                     <span>PROTOTYPE DEMO</span>
-                </button>
-                <button id="btn-conclusion" class="hud-ctrl-btn" title="Play Conclusion Outro Cinematic">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-                    <span>OUTRO</span>
                 </button>
                 <button id="btn-tritonskin" class="hud-ctrl-btn" title="View TritonSkin Interactive Presentation" onclick="window.location.href='tritonskin.html'">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 11 11 13 15 9"/></svg>
@@ -493,17 +489,6 @@
             </div>
         </div>
 
-        <!-- 11. Outro & Conclusion Cinematic Overlays -->
-        <div id="conclusion-overlay" class="hud-hidden">
-            <div class="conclusion-content">
-                <h1 class="font-orbitron text-glow">Underwater Data Center Project</h1>
-                <p class="font-orbitron subtitle">Better for Fish, Better for Humans, Better for Data</p>
-            </div>
-        </div>
-
-        <div id="black-out-screen" class="hud-hidden">
-            <button id="btn-restart-presentation" class="font-orbitron">RESTART PRESENTATION</button>
-        </div>
     </div>
     </div>
 
@@ -515,6 +500,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     
     <!-- Main Logic script -->
-    <script src="main.js"></script>
+    <script src="main.js?v=1.1"></script>
 </body>
 </html>
